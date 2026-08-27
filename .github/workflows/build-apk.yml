@@ -17,32 +17,34 @@ jobs:
         with:
           node-version: 18
 
-      - name: Prepare Web Directory
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Prepare Web Content
         run: |
           mkdir -p www
           [ -d "public" ] && cp -r public/* www/ || true
           [ -d "src" ] && cp -r src www/ || true
-          echo '<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Radar</title></head><body><div id="root"></div></body></html>' > www/index.html
+          if [ ! -f "www/index.html" ]; then
+            echo '<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Radar</title></head><body><div id="root"></div></body></html>' > www/index.html
+          fi
 
-      - name: Setup Capacitor and Add Android
+      - name: Install & Configure Capacitor
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init Radar com.radar.app --web-dir www
           npx cap add android
-          npx cap sync android
-
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Build APK with Gradle
-        run: |
+          
+          # Fix Gradle & Java Compatibility
           cd android
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          sed -i 's/org.gradle.jvmargs=-Xmx2048m/org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8/' gradle.properties || true
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
