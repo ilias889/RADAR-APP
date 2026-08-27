@@ -2,7 +2,9 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
 
 jobs:
   build:
@@ -16,26 +18,26 @@ jobs:
         with:
           node-version: 18
 
-      - name: Create Web Directory and Index
+      - name: Prepare Web Directory
         run: |
           mkdir -p www
-          if [ -d "public" ]; then cp -r public/* www/ 2>/dev/null || true; fi
-          if [ -d "src" ]; then cp -r src www/ 2>/dev/null || true; fi
-          if [ -f "index.html" ]; then cp index.html www/; else echo '<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Radar</title></head><body><div id="root"></div></body></html>' > www/index.html; fi
+          [ -d public ] && cp -r public/* www/ || true
+          [ -d src ] && cp -r src www/ || true
+          echo '<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Radar</title></head><body><div id="root"></div></body></html>' > www/index.html
 
-      - name: Install Capacitor
+      - name: Install Capacitor and Add Android
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "Radar" "com.radar.app" --web-dir www
+          npx cap init Radar com.radar.app --web-dir www
           npx cap add android
           npx cap sync android
 
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: zulu
+          java-version: 17
 
       - name: Build APK with Gradle
         run: |
@@ -43,7 +45,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v3
         with:
           name: Radar-APK
