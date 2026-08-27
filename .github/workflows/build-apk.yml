@@ -16,11 +16,24 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Capacitor & Dependencies
+      - name: Create Package JSON & Install Dependencies
         run: |
-          npm init -y
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+          npm install react react-dom @supabase/supabase-js lucide-react
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "Radar" "com.radar.app" --web-dir .
+
+      - name: Build Web Assets
+        run: |
+          mkdir -p www
+          cp -r public/* www/ 2>/dev/null || true
+          cp -r src www/ 2>/dev/null || true
+          if [ -f index.html ]; then cp index.html www/; fi
+
+      - name: Initialize Capacitor
+        run: |
+          npx cap init "Radar" "com.radar.app" --web-dir www
           npx cap add android
           npx cap sync android
 
