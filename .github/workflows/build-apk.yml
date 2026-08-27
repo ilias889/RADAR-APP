@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Prepare Web Content
+      - name: Prepare Web Assets
         run: |
           mkdir -p www
           [ -d "public" ] && cp -r public/* www/ || true
@@ -32,19 +32,19 @@ jobs:
             echo '<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Radar</title></head><body><div id="root"></div></body></html>' > www/index.html
           fi
 
-      - name: Install & Configure Capacitor
+      - name: Build APK via Capacitor Alternative CLI
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install -g @bubblewrap/cli
+          yes | bubblewrap init --manifest="https://raw.githubusercontent.com/ilias889/radar-app/main/public/manifest.json" --directory=. 2>/dev/null || true
+          
+          # Fallback Build using Android SDK Direct Command
+          npm install @capacitor/core@5 @capacitor/cli@5 @capacitor/android@5
           npx cap init Radar com.radar.app --web-dir www
           npx cap add android
-          
-          # Fix Gradle & Java Compatibility
           cd android
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          sed -i 's/org.gradle.jvmargs=-Xmx2048m/org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8/' gradle.properties || true
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxMetaspaceSize=512m"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
