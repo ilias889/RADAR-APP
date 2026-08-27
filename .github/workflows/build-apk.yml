@@ -16,23 +16,17 @@ jobs:
         with:
           node-version: 18
 
-      - name: Create Package JSON & Install Dependencies
-        run: |
-          if [ ! -f package.json ]; then
-            npm init -y
-          fi
-          npm install react react-dom @supabase/supabase-js lucide-react
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-
-      - name: Build Web Assets
+      - name: Setup Project Files
         run: |
           mkdir -p www
           cp -r public/* www/ 2>/dev/null || true
           cp -r src www/ 2>/dev/null || true
-          if [ -f index.html ]; then cp index.html www/; fi
+          if [ -f index.html ]; then cp index.html www/; else echo '<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Radar</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script><script src="https://unpkg.com/react@18/umd/react.production.min.js"></script><script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script></head><body><div id="root"></div><script type="text/babel" src="src/App.jsx"></script></body></html>' > www/index.html; fi
 
-      - name: Initialize Capacitor
+      - name: Setup Capacitor
         run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "Radar" "com.radar.app" --web-dir www
           npx cap add android
           npx cap sync android
@@ -43,13 +37,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Build APK with Gradle
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: Radar-APK
