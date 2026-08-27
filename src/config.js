@@ -1,6 +1,4 @@
 export const SUPABASE_URL = "https://dthnmkmmmihiqujlrtpk.supabase.co";
 export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0aG5ta21tbWloaXF1amxydHBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODEyMzQsImV4cCI6MjEwMzM1NzIzNH0.-PJH4MfaLhKLNSvb87d5BIprGIV1Q89jbiNLPiCgsCQ";
 
-export const IS_CONFIGURED = 
-  !SUPABASE_URL.includes("YOUR-PROJECT-REF") && 
-  !SUPABASE_ANON_KEY.includes("YOUR-ANON-PUBLIC-KEY");
+export const IS_CONFIGURED = true;
