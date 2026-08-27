@@ -1,0 +1,19 @@
+  {
+  "id": "./index.html",
+  "name": "رادار - كشف الطلبات الوهمية",
+  "short_name": "رادار",
+  "description": "منصة مشتركة لفحص أرقام العملاء والإبلاغ عن الطلبات الوهمية",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a1412",
+  "theme_color": "#0a1412",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
